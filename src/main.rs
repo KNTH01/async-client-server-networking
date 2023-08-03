@@ -50,8 +50,9 @@ async fn main() {
             SyncMode::Sync => server::mode_sync::start(&cli),
             SyncMode::Async => server::mode_async::start(&cli).await,
         },
-        Mode::Client => {
-            println!("Client");
-        }
+        Mode::Client => match cli.sync_mode {
+            SyncMode::Sync => client::mode_sync::connect(&cli),
+            SyncMode::Async => print!("Async Client"),
+        },
     }
 }
