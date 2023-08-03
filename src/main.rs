@@ -14,6 +14,10 @@ pub struct Cli {
     #[arg(value_enum)]
     mode: Mode,
 
+    /// sync or async
+    #[arg(value_enum)]
+    sync_mode: SyncMode,
+
     /// Network port to use
     #[arg(value_parser = clap::value_parser!(u16).range(1..))]
     port: u16,
@@ -31,13 +35,21 @@ enum Mode {
     Client,
 }
 
-fn main() {
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+enum SyncMode {
+    Sync,
+    Async,
+}
+
+#[tokio::main]
+async fn main() {
     let cli = Cli::parse();
 
     match cli.mode {
-        Mode::Server => {
-            server::mode_sync::start_sync(&cli);
-        }
+        Mode::Server => match cli.sync_mode {
+            SyncMode::Sync => server::mode_sync::start(&cli),
+            SyncMode::Async => server::mode_async::start(&cli).await,
+        },
         Mode::Client => {
             println!("Client");
         }

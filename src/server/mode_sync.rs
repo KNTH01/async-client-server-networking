@@ -5,12 +5,12 @@ use std::{
     time::Duration,
 };
 
-use crate::utils::get_addr;
+use crate::utils::{get_addr, print_connection_established};
 use crate::Cli;
 
 const HOST: &str = "127.0.0.1";
 
-pub fn start_sync(cli: &Cli) {
+pub fn start(cli: &Cli) {
     let addr = get_addr(HOST, cli.port);
     let listener = TcpListener::bind(addr.clone()).unwrap();
     println!("Server is now listening synchronously on {addr}");
@@ -28,10 +28,9 @@ pub fn start_sync(cli: &Cli) {
 }
 
 fn handle_connection(mut stream: TcpStream, delay: u64) {
-    println!(
-        "Connection established from {}:{}...",
+    print_connection_established(
         stream.local_addr().unwrap().ip(),
-        stream.local_addr().unwrap().port()
+        stream.local_addr().unwrap().port(),
     );
 
     // read the buffer
