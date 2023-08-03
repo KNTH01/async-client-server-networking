@@ -1,24 +1,37 @@
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 
-/// Simple program to greet a person
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-struct Args {
-    /// Name of the person to greet
-    #[arg(short, long)]
-    name: String,
+#[derive(Parser)]
+#[command(name = "Async Client/Server Networking")]
+#[command(author = "KNTH")]
+#[command(version = "0.1.0")]
+#[command(about = "Starts TCP clients and servers, sync or async.", long_about = None)]
+struct Cli {
+    /// What mode to run the program in
+    #[arg(value_enum)]
+    mode: Mode,
 
-    /// Number of times to greet
-    #[arg(short, long, default_value_t = 1)]
-    count: u8,
+    /// Network port to use
+    #[arg(value_parser = clap::value_parser!(u16).range(1..))]
+    port: u16,
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+enum Mode {
+    /// Spin up a server
+    Server,
+    /// Connect to a server
+    Client,
 }
 
 fn main() {
-    println!("Hello, world!");
-    
-    let args = Args::parse();
+    let cli = Cli::parse();
 
-    for _ in 0..args.count {
-        println!("Hello {}!", args.name)
+    match cli.mode {
+        Mode::Server => {
+            println!("Server");
+        }
+        Mode::Client => {
+            println!("Client");
+        }
     }
 }
