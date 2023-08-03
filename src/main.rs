@@ -52,7 +52,7 @@ async fn main() {
         },
         Mode::Client => match cli.sync_mode {
             SyncMode::Sync => client::mode_sync::connect(&cli),
-            SyncMode::Async => print!("Async Client"),
+            SyncMode::Async => client::mode_async::connect(&cli).await,
         },
     }
 }
