@@ -1,5 +1,10 @@
 use clap::{Parser, ValueEnum};
 
+// use crate::server::sync;
+
+pub mod client;
+pub mod server;
+
 #[derive(Parser)]
 #[command(name = "Async Client/Server Networking")]
 #[command(author = "KNTH")]
@@ -28,7 +33,7 @@ fn main() {
 
     match cli.mode {
         Mode::Server => {
-            println!("Server");
+            server::sync::start_sync(cli.port);
         }
         Mode::Client => {
             println!("Client");
