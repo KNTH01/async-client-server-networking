@@ -1,3 +1,5 @@
+use std::io::stdin;
+
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 
@@ -14,24 +16,29 @@ pub async fn connect(cli: &Cli) {
         .await
         .expect("Should allow connection");
 
-    println!(
-        "Connected to echo server, {}:{}",
-        stream.local_addr().unwrap().ip(),
-        stream.local_addr().unwrap().port()
-    );
+    println!("Connected... {}", stream.local_addr().unwrap(),);
 
-    // write a "Hello, world!" message
-    let message = "Hello, world, from Tokyo!";
-    stream
-        .write_all(message.as_bytes())
-        .await
-        .expect("Should be able to send a message");
-    println!("Sent: {message}");
+    loop {
+        let mut message = String::new();
+        stdin()
+            .read_line(&mut message)
+            .expect("Should be able to read input");
 
-    // read the result
-    let mut buffer = [0; 1024];
-    let len_read = stream.read(&mut buffer[..]).await.unwrap();
-    let message = String::from_utf8_lossy(&buffer);
+        if message.trim().is_empty() {
+            continue;
+        }
 
-    println!("Received: {message}, size: {len_read}");
+        stream
+            .write_all(message.as_bytes())
+            .await
+            .expect("Should be able to send a message");
+        print!("Sent: {message}");
+
+        // read the result
+        let mut buffer = [0; 1024];
+        let len_read = stream.read(&mut buffer[..]).await.unwrap();
+        let message = String::from_utf8_lossy(&buffer);
+
+        println!("Received: {message}, size: {len_read}");
+    }
 }

@@ -26,19 +26,24 @@ async fn handle_connection(mut stream: TcpStream) {
 
     print_connection_established(&peer_addr);
 
-    // read the buffer
-    let mut buffer = [0; 1024];
-    let len_read = stream.read(&mut buffer[..]).await.unwrap();
-    let message = String::from_utf8_lossy(&buffer[..len_read])
-        .trim()
-        .to_string();
-    println!("Received: {message}");
+    loop {
+        let mut buffer = [0; 1024];
+        let len_read = stream.read(&mut buffer[..]).await.unwrap();
 
-    // TODO: call another server
+        if len_read == 0 {
+            println!("connection with {} has closed", peer_addr);
+            break;
+        }
 
-    let output = message;
+        let message = String::from_utf8_lossy(&buffer[..len_read])
+            .trim()
+            .to_string();
+        println!("Received: {message}");
 
-    // write the message
-    stream.write_all(output.as_bytes()).await.unwrap();
-    println!("Sent: {output}");
+        // TODO: call another server
+
+        // write the message
+        stream.write_all(message.as_bytes()).await.unwrap();
+        println!("Sent: {message}");
+    }
 }

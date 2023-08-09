@@ -14,11 +14,7 @@ pub fn connect(cli: &Cli) {
 
     let mut stream = TcpStream::connect(addr).expect("Should allow connection");
 
-    println!(
-        "Connected to echo server, {}:{}",
-        stream.local_addr().unwrap().ip(),
-        stream.local_addr().unwrap().port()
-    );
+    println!("Connected... {}", stream.local_addr().unwrap(),);
 
     loop {
         let mut message = String::new();
@@ -26,10 +22,14 @@ pub fn connect(cli: &Cli) {
             .read_line(&mut message)
             .expect("Should be able to read input");
 
+        if message.trim().is_empty() {
+            continue;
+        }
+
         stream
             .write_all(message.as_bytes())
             .expect("Should be able to send a message");
-        println!("Sent: {message}");
+        print!("Sent: {message}");
 
         // read the result
         let mut buffer = [0; 1024];
