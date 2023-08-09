@@ -22,10 +22,9 @@ pub async fn start(cli: &Cli) {
 }
 
 async fn handle_connection(mut stream: TcpStream) {
-    print_connection_established(
-        stream.peer_addr().unwrap().ip(),
-        stream.peer_addr().unwrap().port(),
-    );
+    let peer_addr = stream.peer_addr().unwrap();
+
+    print_connection_established(&peer_addr);
 
     // read the buffer
     let mut buffer = [0; 1024];

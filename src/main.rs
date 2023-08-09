@@ -23,7 +23,7 @@ pub struct Cli {
     port: u16,
 
     /// Sleep the thread
-    #[arg(short, long, value_parser = clap::value_parser!(u64).range(1..), default_value_t = 2000)]
+    #[arg(short, long, value_parser = clap::value_parser!(u64).range(1..), default_value_t = 1000)]
     delay: u64,
 }
 

@@ -18,7 +18,7 @@ pub fn start(cli: &Cli) {
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
-                handle_connection(stream, 4444);
+                handle_connection(stream, cli.delay);
             }
             Err(_) => {
                 println!("Err when handle connection");
@@ -28,24 +28,30 @@ pub fn start(cli: &Cli) {
 }
 
 fn handle_connection(mut stream: TcpStream, delay: u64) {
-    print_connection_established(
-        stream.peer_addr().unwrap().ip(),
-        stream.peer_addr().unwrap().port(),
-    );
+    let peer_addr = stream.peer_addr().unwrap();
+    print_connection_established(&peer_addr);
 
     // read the buffer
     let mut buffer = [0; 1024];
-    
-    let len_read = stream.read(&mut buffer[..]).unwrap();
-    let message = String::from_utf8_lossy(&buffer[..len_read])
-        .trim()
-        .to_string();
-    println!("Received: {message}");
 
-    // delay the thread
-    thread::sleep(Duration::from_millis(delay));
+    loop {
+        let len_read = stream.read(&mut buffer[..]).unwrap();
 
-    // write the message
-    stream.write_all(message.as_bytes()).unwrap();
-    println!("Sent: {message}");
+        if len_read == 0 {
+            println!("connection with {} has closed", peer_addr);
+            break;
+        }
+
+        let message = String::from_utf8_lossy(&buffer[..len_read])
+            .trim()
+            .to_string();
+        println!("Received: {message}");
+
+        // delay the thread
+        thread::sleep(Duration::from_millis(delay));
+
+        // write the message
+        stream.write_all(message.as_bytes()).unwrap();
+        println!("Sent: {message}");
+    }
 }
