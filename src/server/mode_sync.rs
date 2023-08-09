@@ -29,12 +29,13 @@ pub fn start(cli: &Cli) {
 
 fn handle_connection(mut stream: TcpStream, delay: u64) {
     print_connection_established(
-        stream.local_addr().unwrap().ip(),
-        stream.local_addr().unwrap().port(),
+        stream.peer_addr().unwrap().ip(),
+        stream.peer_addr().unwrap().port(),
     );
 
     // read the buffer
     let mut buffer = [0; 1024];
+    
     let len_read = stream.read(&mut buffer[..]).unwrap();
     let message = String::from_utf8_lossy(&buffer[..len_read])
         .trim()

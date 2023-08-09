@@ -23,8 +23,8 @@ pub async fn start(cli: &Cli) {
 
 async fn handle_connection(mut stream: TcpStream) {
     print_connection_established(
-        stream.local_addr().unwrap().ip(),
-        stream.local_addr().unwrap().port(),
+        stream.peer_addr().unwrap().ip(),
+        stream.peer_addr().unwrap().port(),
     );
 
     // read the buffer
@@ -35,8 +35,7 @@ async fn handle_connection(mut stream: TcpStream) {
         .to_string();
     println!("Received: {message}");
 
-    // call another server
-    // TODO
+    // TODO: call another server
 
     let output = message;
 
